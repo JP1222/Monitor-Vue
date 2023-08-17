@@ -73,7 +73,7 @@
           <!-- 继电器编号列 -->
           <el-table-column
             prop="relayNumber"
-            label="继电器编号"
+            label="阀门"
             align="center"
           ></el-table-column>
           <!-- 控制状态列，使用Switch组件来显示和修改控制状态 -->
@@ -270,7 +270,7 @@ export default {
         return node.relays.map(relay => {
           return {
             '节点编号': node.nodeNumber,
-            '继电器编号': relay.relayNumber,
+            '阀门': relay.relayNumber,
             '控制状态': relay.control ? '开启' : '关闭'
           };
         });

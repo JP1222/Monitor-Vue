@@ -26,14 +26,14 @@
             </el-col> -->
           </el-row>
           <el-row>
-            <el-col :span="8" :xs="24">
+            <el-col :span="6" :xs="24">
               <el-form-item>
                 <el-switch v-model="autoMode" active-text="自动模式" inactive-text="手动模式" @change="switchCurrentMode">
                   ></el-switch>
               </el-form-item>
             </el-col>
             <!-- 导出按钮 -->
-            <el-col :span="8" :xs="24">
+            <el-col :span="6" :xs="24">
               <el-form-item>
                 <el-button @click="downloadExcel" type="primary">导出 Excel</el-button>
               </el-form-item>
@@ -43,11 +43,18 @@
       </div>
       <el-table :data="tableData" stripe :border="true" :height="getHeightWithOutHeader" highlight-current-row
         style="font-size: 1rem">
-        <el-table-column :prop="item.prop" :label="item.label" v-for="(item, index) in options" :key="index"
+        <el-table-column v-for="(item, index) in options" :prop="item.prop" :label="item.label"  :key="index"
           :width="item.width">
+
+          <!-- 如果是操作那一行就渲染一个控制开关 -->
           <template v-if="item.prop === 'action'" v-slot="{ row }">
             <el-switch @change="handleControlChange(row.id, row.control)" v-model="row.control" active-color="#13ce66"
-              inactive-color="#ff4949" :disabled="autoMode"></el-switch>
+                       inactive-color="#ff4949" :disabled="autoMode"></el-switch>
+          </template>
+
+          <!-- 如果是删除那一行就渲染一个删除开关，注意这里需要加上else，因为有两个template如果不加上else下面会把上面的替换掉 -->
+          <template v-else-if="item.prop === 'delete'" v-slot="{ row }">
+            <el-button type="danger">删除节点</el-button>
           </template>
         </el-table-column>
       </el-table>

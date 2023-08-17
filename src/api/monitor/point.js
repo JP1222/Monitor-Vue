@@ -46,12 +46,7 @@ export async function getExcel(startDate, endDate) {
       }
     });
 
-    // 将 response.data 转换为 Blob 对象
-    const blob = new Blob([response.data], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    });
-
-    const url = window.URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(response.data);
     const link = document.createElement('a');
     link.href = url;
     link.download = "history.xlsx"; // 下载的文件名
