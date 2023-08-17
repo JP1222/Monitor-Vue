@@ -16,10 +16,11 @@
         </el-row>
       </el-form>
     </el-card>
-    <div ref="chart" style="width: 100%; height: 100%;"></div>
+
+    <!-- Add chart divs for each data type -->
+    <div v-for="dataType in chartDataTypes" :key="dataType" :ref="dataType" style="width: 100%; height: 500px; margin-top: 20px;"></div>
 
   </div>
-
 </template>
 
 <script>
@@ -30,21 +31,24 @@ export default {
   data() {
     return {
       nodes: Array(8).fill(''),
-      chart: null,
+      charts: {},  // Store multiple charts
       timer: null,
-      requestSource: axios.CancelToken.source()
+      requestSource: axios.CancelToken.source(),
+      chartDataTypes: ['AirWet', 'AirTemperature', 'CO2', 'Light', 'SoilWet', 'SoilTemperature']
     }
   },
   mounted() {
-    this.chart = echarts.init(this.$refs.chart);
+    this.chartDataTypes.forEach(dataType => {
+      this.charts[dataType] = echarts.init(this.$refs[dataType][0]);
+    });
     this.timer = setInterval(this.fetchData, 5000);
-
   },
+
   beforeDestroy() {
     clearInterval(this.timer);
     this.requestSource.cancel('Component is being destroyed');
-
   },
+
   methods: {
     async fetchData() {
       let filteredNodes = this.nodes.filter(node => node.trim() !== '');
@@ -55,7 +59,7 @@ export default {
           cancelToken: this.requestSource.token
         });
         if (response.data.success) {
-          this.updateChart(response.data.body );
+          this.updateChart(response.data.body);//这里调用updateChart修改图表数据
         } else {
           this.$message.error('获取数据失败');
         }
@@ -67,79 +71,94 @@ export default {
         }
       }
     },
+
+    //把后端数据修改适合图表展示
+    formatChartData(rawData) {
+      const result = {};
+      this.chartDataTypes.forEach(dataType => {
+        result[dataType] = {};
+        for (const node in rawData[0]) {
+          rawData[0][node].forEach(dataObj => {
+            if (dataObj[dataType]) {
+              result[dataType][node] = dataObj[dataType].map(dataEntry => {
+                const parts = dataEntry.split(' : ');
+                return {
+                  timestamp: parts[0],
+                  value: parseFloat(parts[1])
+                };
+              });
+            }
+          });
+        }
+      });
+      return result;
+    },
+    //修改图表数据的方法
     updateChart(data) {
-      const option = {
-        tooltip: {
-          trigger: 'axis',
-          position: function (pt) {
-            return [pt[0], '10%'];
-          }
-        },
-        title: {
-          text: 'Large Ara Chart'
-        },
-        legend: {},
-        toolbox: {
-          feature: {
-            dataZoom: {
-              yAxisIndex: 'none'
-            },
-            restore: {},
-            saveAsImage: {}
-          }
-        },
-        xAxis: {
-          type: 'time',
-          boundaryGap: false
-        },
-        yAxis: {
-          type: 'value',
-          boundaryGap: [0, '100%']
-        },
-        dataZoom: [
-          {
-            type: 'inside',
-            start: 0,
-            end: 20
-          },
-          {
-            start: 0,
-            end: 20
-          }
-        ],
-        series: [
-          {
-            name: 'Fake Data',
+      const formattedData = this.formatChartData(data);
+      this.chartDataTypes.forEach(dataType => {
+        const seriesData = [];
+        for (const node in formattedData[dataType]) {
+          formattedData[dataType][node].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));//排序方便数据按顺序展示
+          const times = formattedData[dataType][node].map(entry => entry.timestamp);
+          const values = formattedData[dataType][node].map(entry => entry.value);
+          seriesData.push({
+            name: node,
             type: 'line',
             smooth: true,
-            symbol: 'none',
-            areaStyle: {},
-            tooltip: {},
-            data: data
+            data: values.map((value, index) => [times[index], value])
+          });
+        }
+        const option = {
+          tooltip: {
+            trigger: 'axis',
+            position: function (pt) {
+              return [pt[0], '10%'];
+            }
           },
-          // {
-          //   name: 'Data',
-          //   type: 'line',
-          //   smooth: true,
-          //   symbol: 'none',
-          //   areaStyle: {},
-          //   tooltip: {},
-          //   data: data2
-          // }
-        ]
-      };
-      if (this.chart) {
-        this.chart.setOption(option);
-      }
-    },
+          title: {
+            text: dataType
+          },
+          legend: {},
+          toolbox: {
+            feature: {
+              dataZoom: {
+                yAxisIndex: 'none'
+              },
+              restore: {},
+              saveAsImage: {}
+            }
+          },
+          xAxis: {
+            type: 'time',
+            boundaryGap: false
+          },
+          yAxis: {
+            type: 'value',
+            boundaryGap: [0, '100%']
+          },
+          dataZoom: [
+            {
+              type: 'inside',
+              start: 0,
+              end: 100
+            },
+            {
+              start: 0,
+              end: 100
+            }
+          ],
+          series: seriesData
+        };
+        this.charts[dataType].setOption(option);
+      });
+    }
   }
-
 }
 </script>
 
 <style scoped>
-
 .demo-form-inline .el-form-item {
-  margin-right: 5px; /* 增加表单项之间的间距 */
+  margin-right: 5px;
 }
 </style>
