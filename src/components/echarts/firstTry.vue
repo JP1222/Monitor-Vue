@@ -8,9 +8,13 @@
               <el-input v-model="nodes[index - 1]" placeholder=""></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="4">
+          <el-col>
             <el-form-item>
               <el-button type="primary" size="large" @click="fetchData">查询</el-button>
+              <span id="Tips">按键跳转</span>
+              <el-button v-for="(dataType, index) in chartDataTypesTitles" :key="dataType" @click="goToChart(index)">
+                {{ dataType }}
+              </el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -18,7 +22,7 @@
     </el-card>
 
     <!-- Add chart divs for each data type -->
-    <div v-for="dataType in chartDataTypes" :key="dataType" :ref="dataType" style="width: 100%; height: 500px; margin-top: 20px;"></div>
+    <div v-for="dataType in chartDataTypes" :key="dataType" :id="dataType" :ref="dataType" style="width: 100%; height: 500px; margin-top: 20px;"></div>
 
   </div>
 </template>
@@ -34,7 +38,8 @@ export default {
       charts: {},  // Store multiple charts
       timer: null,
       requestSource: axios.CancelToken.source(),
-      chartDataTypes: ['AirWet', 'AirTemperature', 'CO2', 'Light', 'SoilWet', 'SoilTemperature']
+      chartDataTypes: ['AirWet', 'AirTemperature', 'CO2', 'Light', 'SoilWet', 'SoilTemperature'],
+      chartDataTypesTitles: ['空气湿度', '空气温度', '二氧化碳', '光照', '土壤湿度', '土壤温度'],
     }
   },
   mounted() {
@@ -50,6 +55,14 @@ export default {
   },
 
   methods: {
+    //跳转到对应图表按钮
+    goToChart(index) {
+      const element = document.getElementById(this.chartDataTypes[index]);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
+    //向后端获取数据方法
     async fetchData() {
       let filteredNodes = this.nodes.filter(node => node.trim() !== '');
       try {
@@ -95,18 +108,35 @@ export default {
     },
     //修改图表数据的方法
     updateChart(data) {
-      const formattedData = this.formatChartData(data);
-      this.chartDataTypes.forEach(dataType => {
+      const formattedData = this.formatChartData(data);//调用格式化方法把后端数据格式化
+      // console.log(formattedData)//可以去控制台查看格式后的数据
+
+      this.chartDataTypes.forEach((dataType, index) => {
         const seriesData = [];
         for (const node in formattedData[dataType]) {
           formattedData[dataType][node].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));//排序方便数据按顺序展示
-          const times = formattedData[dataType][node].map(entry => entry.timestamp);
+          const times = formattedData[dataType][node].map(entry => entry.timestamp);//返回每个节点的timestamp属性（数组）
           const values = formattedData[dataType][node].map(entry => entry.value);
+          // formattedData[dataType][node] = [
+          //   { timestamp: '2023-08-01', value: 10 },
+          //   { timestamp: '2023-08-02', value: 12 },
+          //   { timestamp: '2023-08-03', value: 11 }
+          // ];
+          //变成
+          // times = ['2023-08-01', '2023-08-02', '2023-08-03'];
+          // values = [10, 12, 11];
+
           seriesData.push({
             name: node,
             type: 'line',
             smooth: true,
             data: values.map((value, index) => [times[index], value])
+            //这个输入[10, 12, 11]，返回
+            // [
+            //   ['2023-08-01', 10],
+            //   ['2023-08-02', 12],
+            //   ['2023-08-03', 11]
+            // ]这个默认第一个是x轴，第二个是y轴
           });
         }
         const option = {
@@ -117,7 +147,7 @@ export default {
             }
           },
           title: {
-            text: dataType
+            text: this.chartDataTypesTitles[index]//这里把图表标题改为中文
           },
           legend: {},
           toolbox: {
@@ -161,4 +191,9 @@ export default {
 .demo-form-inline .el-form-item {
   margin-right: 5px;
 }
+
+#Tips{
+  margin: 0 10px 0 30px;
+  font-size: 18px;
+ }
 </style>
