@@ -1,7 +1,8 @@
 import service from '../service'
 
 // 全局变量，用于追踪定时器状态
-let timerRunning = false;
+// eslint-disable-next-line no-unused-vars
+const timerRunning = false
 
 // 获取所有节点
 export async function getNodes() {
@@ -13,12 +14,10 @@ export async function findNode(nodeNumber) {
   return service.get(`/node/${nodeNumber}`)
 }
 
-
 // 添加节点
 export async function addNode(nodeNumber) {
   return service.post('/node/nodes', { nodeNumber })
 }
-
 
 // 删除节点
 export async function deleteNode(nodeNumber) {

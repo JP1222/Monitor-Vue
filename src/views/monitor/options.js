@@ -1,13 +1,17 @@
 export const options = [
-  {
-    label: '',
-    prop: 'id',
-    width: '50'
-  },
+  // {
+  //   label: '',
+  //   prop: 'id',
+  //   width: '50'
+  // },
   {
     label: '节点编号',
-    prop: 'number'
+    prop: 'select'
   },
+  // {
+  //   label: '节点编号',
+  //   prop: 'number'
+  // },
   {
     label: '空气湿度(%RH)',
     prop: 'airWet'
@@ -38,10 +42,10 @@ export const options = [
   },
   {
     label: '节点状态',
-    prop: 'action',
+    prop: 'action'
   },
   {
     label: '节点删除',
-    prop: 'delete',
+    prop: 'delete'
   }
 ]

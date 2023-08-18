@@ -1,6 +1,7 @@
 import Axios from 'axios'
 import service from '../service'
 
+// eslint-disable-next-line no-unused-vars
 import { MessageBox, Message } from 'element-ui'
 
 // 获取节点（分页、可搜索）
@@ -33,27 +34,58 @@ export async function setCurrentMode(mode) {
   return service.post('/control/mode/current', { mode })
 }
 
-// 导出表格
+// 导出表格（日期）
 export async function getExcel(startDate, endDate) {
   try {
     const response = await Axios({
-      url: "http://47.114.81.63:8081/history/excel",
-      method: "GET",
+      url: 'http://47.114.81.63:8081/history/excel',
+      method: 'GET',
       responseType: 'blob',
       params: {
         startDate: startDate,
         endDate: endDate
       }
-    });
+    })
 
-    const url = window.URL.createObjectURL(response.data);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = "history.xlsx"; // 下载的文件名
-    link.click();
+    const url = window.URL.createObjectURL(response.data)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'history.xlsx' // 下载的文件名
+    link.click()
   } catch (error) {
-    console.error("Error while downloading Excel:", error);
-    console.log("Error response data:", error.response && error.response.data);
+    console.error('Error while downloading Excel:', error)
+    console.log('Error response data:', error.response && error.response.data)
   }
+}
+
+// 导出表格（选择）
+export async function getExcelBySelect(selectPoints) {
+  try {
+    const response = await Axios({
+      url: 'http://47.114.81.63:8081/history/excelByPoint',
+      method: 'post',
+      responseType: 'blob',
+      data: {
+        selectPoints
+      }
+    })
+
+    const url = window.URL.createObjectURL(response.data)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'history.xlsx' // 下载的文件名
+    link.click()
+  } catch (error) {
+    console.error('Error while downloading Excel:', error)
+    console.log('Error response data:', error.response && error.response.data)
+  }
+}
+
+// 删除节点
+export function deletePoint(nodeNumber) {
+  return service({
+    url: `/node/delete/${nodeNumber}`,
+    method: 'delete'
+  })
 }
 

@@ -33,9 +33,14 @@
               </el-form-item>
             </el-col>
             <!-- 导出按钮 -->
-            <el-col :span="6" :xs="24">
+            <el-col :span="4" :xs="24">
               <el-form-item>
-                <el-button type="primary" @click="downloadExcel">导出 Excel</el-button>
+                <el-button type="primary" @click="downloadExcelbyData">按日期导出 Excel</el-button>
+              </el-form-item>
+            </el-col>
+            <el-col :span="4" :xs="24">
+              <el-form-item>
+                <el-button type="primary" @click="downloadExcelBySelect">按选择导出 Excel</el-button>
               </el-form-item>
             </el-col>
           </el-row>
@@ -54,7 +59,6 @@
           :key="index"
           :prop="item.prop"
           :label="item.label"
-          :width="item.width"
         >
 
           <!-- 如果是操作那一行就渲染一个控制开关 -->
@@ -70,7 +74,11 @@
 
           <!-- 如果是删除那一行就渲染一个删除开关，注意这里需要加上else，因为有两个template如果不加上else下面会把上面的替换掉 -->
           <template v-else-if="item.prop === 'delete'" v-slot="{ row }">
-            <el-button type="danger">删除节点</el-button>
+            <el-button type="danger" plain @click="deleteMethod(row.number)">删除节点</el-button>
+          </template>
+          <!-- 是选择列就渲染一个单选框-->
+          <template v-else-if="item.prop === 'select'" v-slot="{ row }">
+            <el-checkbox v-model="selectPoints" :label="row.number" border />
           </template>
         </el-table-column>
       </el-table>
@@ -84,7 +92,9 @@ import {
   setCurrentMode,
   getPoint,
   pointControlChange,
-  getExcel
+  getExcel,
+  getExcelBySelect,
+  deletePoint
 } from '@/api/monitor/point'
 import { options } from './options.js'
 import { getHeightWithOutHeader } from '@/utils/validate'
@@ -93,7 +103,8 @@ import { format } from 'date-fns'
 export default {
   data() {
     return {
-      autoMode: true,
+      selectPoints: [],
+      autoMode: true, // 自动模式初始化
 
       startDate: '',
       endDate: '',
@@ -131,8 +142,23 @@ export default {
   },
 
   methods: {
+    // 删除节点
+    async deleteMethod(nodenumber) {
+      try {
+        const res = await deletePoint(nodenumber)
+        if (res.success) {
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          })
+        }
+        await this.getData()
+      } catch (error) {
+        this.handleError(error)
+      }
+    },
     // 导出表格
-    async downloadExcel() {
+    async downloadExcelbyData() {
       // 获取开始日期和结束日期
       const startDate = this.startDate // 替换为实际的开始日期
       const endDate = this.endDate // 替换为实际的结束日期
@@ -161,6 +187,21 @@ export default {
       } catch (error) {
         // 处理下载失败的情况
         console.error(error)
+      }
+    },
+
+    // 导出表格（按选择）
+    async downloadExcelBySelect() {
+      try {
+        const res = await getExcelBySelect(this.selectPoints)
+        if (res.success) {
+          this.$message({
+            message: '导出成功',
+            type: 'success'
+          })
+        }
+      } catch (error) {
+        this.handleError(error)
       }
     },
 
