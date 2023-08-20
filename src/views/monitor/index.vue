@@ -35,12 +35,7 @@
             <!-- 导出按钮 -->
             <el-col :span="4" :xs="24">
               <el-form-item>
-                <el-button type="primary" @click="downloadExcelbyData">按日期导出 Excel</el-button>
-              </el-form-item>
-            </el-col>
-            <el-col :span="4" :xs="24">
-              <el-form-item>
-                <el-button type="primary" @click="downloadExcelBySelect">按选择导出 Excel</el-button>
+                <el-button type="primary" @click="downloadExcel">导出Excel表格</el-button>
               </el-form-item>
             </el-col>
           </el-row>
@@ -93,10 +88,9 @@ import {
   getPoint,
   pointControlChange,
   getExcel,
-  getExcelBySelect,
   deletePoint
 } from '@/api/monitor/point'
-import { options } from './options.js'
+import { options } from '../../../../options.js'
 import { getHeightWithOutHeader } from '@/utils/validate'
 import { format } from 'date-fns'
 
@@ -106,7 +100,7 @@ export default {
       selectPoints: [],
       autoMode: true, // 自动模式初始化
 
-      startDate: '',
+      startDate: '', // 导出表格选择时间初始化
       endDate: '',
 
       tableData: [],
@@ -158,14 +152,13 @@ export default {
       }
     },
     // 导出表格
-    async downloadExcelbyData() {
+    async downloadExcel() {
       // 获取开始日期和结束日期
       const startDate = this.startDate // 替换为实际的开始日期
       const endDate = this.endDate // 替换为实际的结束日期
 
       // 检查 startDate 和 endDate 是否为有效的日期对象
       if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
-        // 如果 startDate 或 endDate 不是有效的日期对象，可以给出提示或者进行其他处理
         this.$message({
           message: '选择有效的开始日期和结束日期',
           type: 'warning'
@@ -178,7 +171,7 @@ export default {
       const formattedEndDate = format(endDate, 'yyyy-MM-dd')
 
       try {
-        await getExcel(formattedStartDate, formattedEndDate)
+        await getExcel(formattedStartDate, formattedEndDate, this.selectPoints)
         // 下载成功后的操作
         this.$message({
           message: '导出成功',
@@ -187,21 +180,6 @@ export default {
       } catch (error) {
         // 处理下载失败的情况
         console.error(error)
-      }
-    },
-
-    // 导出表格（按选择）
-    async downloadExcelBySelect() {
-      try {
-        const res = await getExcelBySelect(this.selectPoints)
-        if (res.success) {
-          this.$message({
-            message: '导出成功',
-            type: 'success'
-          })
-        }
-      } catch (error) {
-        this.handleError(error)
       }
     },
 
