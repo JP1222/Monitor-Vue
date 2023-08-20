@@ -11,7 +11,7 @@
                 <el-input v-model="paramsList.nodeNumber" clearable>
                   <!-- 添加节点按钮，点击后调用addNode方法 -->
                   <template #append>
-                    <el-button :loading="addingNode" @click="addNode" type="primary" :disabled="autoMode">添加节点</el-button>
+                    <el-button :loading="addingNode" type="primary" :disabled="autoMode" @click="addNode">添加节点</el-button>
                   </template>
                 </el-input>
               </el-form-item>
@@ -22,14 +22,14 @@
                 <el-input v-model="paramsList.searchNode" clearable>
                   <!-- 查找节点按钮，点击后调用findNode方法 -->
                   <template #append>
-                    <el-button :loading="findingNode" @click="findNode" type="primary">查找节点</el-button>
+                    <el-button :loading="findingNode" type="primary" @click="findNode">查找节点</el-button>
                   </template>
                 </el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8" :xs="24">
               <el-form-item>
-                <el-button class="findall" @click="getNodes" type="primary">显示全部节点</el-button>
+                <el-button class="findall" type="primary" @click="getNodes">显示全部节点</el-button>
               </el-form-item>
             </el-col>
             <el-col :span="8" :xs="24">
@@ -38,14 +38,14 @@
                   v-model="autoMode"
                   active-text="自动模式"
                   inactive-text="手动模式"
-                  @change="switchCurrentMode">
-                </el-switch>
+                  @change="switchCurrentMode"
+                />
               </el-form-item>
             </el-col>
             <!-- 导出按钮 -->
             <el-col :span="8" :xs="24">
               <el-form-item>
-                <el-button @click="exportExcel" type="primary">导出 Excel</el-button>
+                <el-button type="primary" @click="exportExcel">导出 Excel</el-button>
               </el-form-item>
             </el-col>
           </el-row>
@@ -59,7 +59,7 @@
           <span class="node-number">节点 {{ node.nodeNumber }}</span>
           <!-- 删除节点按钮，点击后调用deleteNode方法 -->
           <span class="delete-button">
-            <el-button @click="deleteNode(node.nodeNumber)" type="danger" :disabled="autoMode">删除节点</el-button>
+            <el-button type="danger" :disabled="autoMode" @click="deleteNode(node.nodeNumber)">删除节点</el-button>
           </span>
         </h3>
         <!-- Element UI的Table组件，用于显示节点的继电器列表 -->
@@ -75,7 +75,7 @@
             prop="relayNumber"
             label="阀门"
             align="center"
-          ></el-table-column>
+          />
           <!-- 控制状态列，使用Switch组件来显示和修改控制状态 -->
           <el-table-column
             prop="control"
@@ -84,12 +84,12 @@
             <template slot-scope="{ row }">
               <!-- 当Switch组件的状态改变时，调用handleControlChange方法 -->
               <el-switch
-                @change="handleControlChange(node.nodeNumber, row.relayNumber, row.control)"
                 v-model="row.control"
                 active-color="#13ce66"
                 inactive-color="#ff4949"
                 :disabled="autoMode"
-              ></el-switch>
+                @change="handleControlChange(node.nodeNumber, row.relayNumber, row.control)"
+              />
             </template>
           </el-table-column>
         </el-table>
@@ -100,10 +100,10 @@
 </template>
 
 <script>
-import { getNodes, addNode, findNode, deleteNode, controlRelay,setCurrentMode,getCurrentMode } from '@/api/relay/relayApi'
+import { getNodes, addNode, findNode, deleteNode, controlRelay, setCurrentMode, getCurrentMode } from '@/api/relay/relayApi'
 import { options } from './options.js'
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx'
+import { saveAs } from 'file-saver'
 
 export default {
   data() {
@@ -125,43 +125,42 @@ export default {
   },
   async mounted() {
     try {
-      await this.getNodes();
-      let response = await getCurrentMode();
-      this.autoMode = response.body.status;
+      await this.getNodes()
+      const response = await getCurrentMode()
+      this.autoMode = response.body.status
 
-      this.dataInterval = setInterval(async () => {
+      this.dataInterval = setInterval(async() => {
         if (this.mode === 'get') {
-          await this.getNodes(false); // 不显示成功消息
+          await this.getNodes(false) // 不显示成功消息
         } else if (this.mode === 'find') {
-          await this.findNode(false);
+          await this.findNode(false)
         }
 
-        let response = await getCurrentMode();
-        this.autoMode = response.body.status;
-      }, 5000); // 每5秒执行一次
-
+        const response = await getCurrentMode()
+        this.autoMode = response.body.status
+      }, 5000) // 每5秒执行一次
     } catch (error) {
-      this.handleError(error);
+      this.handleError(error)
     }
   },
 
   beforeDestroy() {
     if (this.dataInterval) {
-      clearInterval(this.dataInterval);
+      clearInterval(this.dataInterval)
     }
   },
 
   methods: {
-// 查找节点的方法
+    // 查找节点的方法
     async findNode(showSuccessMessage = true) {
-      this.mode = 'find';
+      this.mode = 'find'
       this.findingNode = true // 开始查找节点，设置加载状态为true
       try {
         // 调用服务器接口，查找节点
-        const nodeNumber = this.paramsList.searchNode;
-        this.validateNodeNumber(nodeNumber); // 调用校验方法进行节点编号的校验
+        const nodeNumber = this.paramsList.searchNode
+        this.validateNodeNumber(nodeNumber) // 调用校验方法进行节点编号的校验
         // 调用服务器接口，查找节点
-        const res = await findNode(nodeNumber);
+        const res = await findNode(nodeNumber)
         if (res.success) {
           // 如果查找成功，更新nodes数组，并显示一个成功消息
           this.nodes = res.body ? [res.body] : []
@@ -169,7 +168,7 @@ export default {
             this.$message({
               message: '查找节点成功',
               type: 'success'
-            });
+            })
           }
         } else {
           // 如果服务器返回的success字段为false，那么抛出一个错误
@@ -185,7 +184,7 @@ export default {
 
     // 获取节点列表的方法。默认情况下，成功获取节点后会显示一个成功消息。
     async getNodes(showSuccessMessage = true) {
-      this.mode = 'get';
+      this.mode = 'get'
       try {
         this.paramsList.searchNode = ''
         const res = await getNodes()
@@ -212,15 +211,15 @@ export default {
     // 添加节点的方法
     async addNode() {
       if (!this.nodes) {
-        this.nodes = [];
+        this.nodes = []
       }
       this.addingNode = true // 开始添加节点，设置加载状态为true
       try {
-        const nodeNumber = this.paramsList.nodeNumber;
-        this.validateNodeNumber(nodeNumber); // 调用校验方法进行节点编号的校验
+        const nodeNumber = this.paramsList.nodeNumber
+        this.validateNodeNumber(nodeNumber) // 调用校验方法进行节点编号的校验
 
         // 调用服务器接口，添加节点
-        const res = await addNode(nodeNumber);
+        const res = await addNode(nodeNumber)
         if (res.success) {
           // 如果添加成功，将新节点添加到nodes数组中，清空输入框，并显示一个成功消息
           const newNode = res.body
@@ -242,11 +241,9 @@ export default {
       }
     },
 
-
-
-    //切换模式
+    // 切换模式
     async switchCurrentMode(newMode) {
-      const oldMode = this.autoMode;
+      const oldMode = this.autoMode
       try {
         const res = await setCurrentMode(newMode)
         if (res.success) {
@@ -264,7 +261,7 @@ export default {
       }
     },
 
-    //导出表格
+    // 导出表格
     exportExcel() {
       const data = this.nodes.flatMap(node => {
         return node.relays.map(relay => {
@@ -272,80 +269,76 @@ export default {
             '节点编号': node.nodeNumber,
             '阀门': relay.relayNumber,
             '控制状态': relay.control ? '开启' : '关闭'
-          };
-        });
-      });
+          }
+        })
+      })
 
-      const worksheet = XLSX.utils.json_to_sheet(data);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const excelData = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      saveAs(excelData, '继电器信息.xlsx');
+      const worksheet = XLSX.utils.json_to_sheet(data)
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+      const excelData = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+      saveAs(excelData, '继电器信息.xlsx')
     },
 
-    //校验输入
+    // 校验输入
     validateNodeNumber(nodeNumber) {
       // 校验不能为空
       if (!nodeNumber) {
-        throw new Error('节点编号不能为空');
+        throw new Error('节点编号不能为空')
       }
 
       // 校验不能有空格
       if (nodeNumber.trim() !== nodeNumber) {
-        throw new Error('节点编号不能包含空格');
+        throw new Error('节点编号不能包含空格')
       }
 
       // 校验长度限制
-      const maxLength = 10; // 设置长度限制为10个字符
+      const maxLength = 10 // 设置长度限制为10个字符
       if (nodeNumber.length > maxLength) {
-        throw new Error('节点编号长度不能超过' + maxLength + '个字符');
+        throw new Error('节点编号长度不能超过' + maxLength + '个字符')
       }
 
-      return true;
+      return true
     },
-
 
     // 处理控制状态变化的方法
     async handleControlChange(nodeNumber, relayNumber, control) {
-      const node = this.nodes.find((node) => node.nodeNumber === nodeNumber);
-      const relay = node.relays.find((relay) => relay.relayNumber === relayNumber);
+      const node = this.nodes.find((node) => node.nodeNumber === nodeNumber)
+      const relay = node.relays.find((relay) => relay.relayNumber === relayNumber)
 
       // 在发起请求之前先暂存控制状态
-      const previousControl = relay.control;
+      const previousControl = relay.control
 
       // 禁用开关按钮
-      relay.disabled = true;
+      relay.disabled = true
 
       try {
         // 调用服务器接口，改变控制状态
-        const res = await controlRelay({ nodeNumber, relayNumber, control });
+        const res = await controlRelay({ nodeNumber, relayNumber, control })
 
         if (res.code === 200 && res.success) {
-          const updatedRelay = res.body;
+          const updatedRelay = res.body
           // 更新对应的控制状态，并显示一个成功消息
-          relay.control = updatedRelay.control;
-          const message = control ? '继电器开启成功' : '继电器关闭成功';
+          relay.control = updatedRelay.control
+          const message = control ? '继电器开启成功' : '继电器关闭成功'
           this.$message({
             message: message,
-            type: 'success',
-          });
+            type: 'success'
+          })
         } else {
           // 如果控制状态改变失败或状态码不是200，则抛出一个错误，并恢复之前的状态
-          throw new Error('控制继电器失败');
+          throw new Error('控制继电器失败')
         }
       } catch (error) {
         // 如果在控制状态改变的过程中出现任何错误，那么处理这个错误，并恢复之前的状态
-        this.handleError(error);
-        relay.control = previousControl;
+        this.handleError(error)
+        relay.control = previousControl
       } finally {
         // 启用开关按钮
-        relay.disabled = false;
+        relay.disabled = false
       }
     },
-
-
-
 
     // 删除节点的方法
     async deleteNode(nodeNumber) {

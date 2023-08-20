@@ -54,10 +54,10 @@ export default {
         console.log(result)
         for (let i = 0; i <= 2; i++) {
           const nodeNumberValue = result.body.content[i].nodeNumber
-          console.log(nodeNumberValue)
           this.initNodes.push(nodeNumberValue)
         }
         this.updateChart(this.initNodes)
+        this.$message.success('初始化图表成功')
       })
       .catch(error => {
         console.error('Error while fetching nodes:', error)
@@ -82,9 +82,10 @@ export default {
     },
     // 向后端获取数据方法
     async fetchData() {
-      const filteredNodes = this.nodes.filter(node => node.trim() !== '')
+      const filteredNodes = this.nodes.filter(node => node.trim() !== '')// 如果输入框没有输入要查询的节点，向后端查询默认节点
       try {
-        const nodesToSend = filteredNodes.length ? filteredNodes : this.initNodes;
+        const nodesToSend = filteredNodes.length ? filteredNodes : this.initNodes
+        console.log('请求数据:' + nodesToSend)
         const response = await axios.post('http://47.114.81.63:8081/node/chartData', {
           nodes: nodesToSend
         }, {
