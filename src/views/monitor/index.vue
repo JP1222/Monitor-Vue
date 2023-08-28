@@ -41,6 +41,7 @@
           </el-row>
         </el-form>
       </div>
+      <!--表格部分-->
       <el-table
         :data="tableData"
         stripe
@@ -90,7 +91,7 @@ import {
   getExcel,
   deletePoint
 } from '@/api/monitor/point'
-import { options } from '../../../../options.js'
+import { options } from './options.js'
 import { getHeightWithOutHeader } from '@/utils/validate'
 import { format } from 'date-fns'
 

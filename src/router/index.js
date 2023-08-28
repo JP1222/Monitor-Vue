@@ -45,32 +45,33 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
     children: [
       {
-        path: 'dashboard',
+        path: '',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/index'),
         meta: { title: '首页', icon: 'dashboard' }
       }
     ]
   },
-
   {
-    path: '/dataMonitor',
+    path: '/monitor',
     component: Layout,
-    redirect: '/example/table',
-    name: 'DataMonitor',
-    meta: { title: '数据监测', icon: 'el-icon-monitor' },
     children: [
       {
-        path: 'monitor',
+        path: '',
         name: 'Monitor',
         component: () => import('@/views/monitor/index'),
         meta: { title: '实时监测', icon: 'el-icon-s-marketing' }
-      },
+      }
+    ]
+  },
+  {
+    path: '/relayModule',
+    component: Layout,
+    children: [
       {
-        path: 'relayModule',
+        path: '',
         name: 'RelayModule',
         component: () => import('@/views/relay/index'),
         meta: { title: '灌溉控制', icon: 'el-icon-switch-button' }
@@ -78,6 +79,27 @@ export const constantRoutes = [
     ]
   },
 
+  // {
+  //   path: '/dataMonitor',
+  //   component: Layout,
+  //   redirect: '/example/table',
+  //   name: 'DataMonitor',
+  //   meta: { title: '数据监测', icon: 'el-icon-monitor' },
+  //   children: [
+  //     {
+  //       path: 'monitor',
+  //       name: 'Monitor',
+  //       component: () => import('@/views/monitor/index'),
+  //       meta: { title: '实时监测', icon: 'el-icon-s-marketing' }
+  //     },
+  //     {
+  //       path: 'relayModule',
+  //       name: 'RelayModule',
+  //       component: () => import('@/views/relay/index'),
+  //       meta: { title: '灌溉控制', icon: 'el-icon-switch-button' }
+  //     }
+  //   ]
+  // },
   { path: '*', redirect: '/404', hidden: true }
 ]
 
