@@ -56,7 +56,6 @@
           :prop="item.prop"
           :label="item.label"
         >
-
           <!-- 如果是操作那一行就渲染一个控制开关 -->
           <template v-if="item.prop === 'action'" v-slot="{ row }">
             <el-switch
@@ -67,7 +66,6 @@
               @change="handleControlChange(row.id, row.control)"
             />
           </template>
-
           <!-- 如果是删除那一行就渲染一个删除开关，注意这里需要加上else，因为有两个template如果不加上else下面会把上面的替换掉 -->
           <template v-else-if="item.prop === 'delete'" v-slot="{ row }">
             <el-button type="danger" plain @click="deleteMethod(row.number)">删除节点</el-button>
@@ -75,6 +73,10 @@
           <!-- 是选择列就渲染一个单选框-->
           <template v-else-if="item.prop === 'select'" v-slot="{ row }">
             <el-checkbox v-model="selectPoints" :label="row.number" border />
+          </template>
+          <!-- 是其他列就显示数据和单位 -->
+          <template v-else v-slot="{ row }">
+            {{ row[item.prop] }} {{ item.unit }}
           </template>
         </el-table-column>
       </el-table>

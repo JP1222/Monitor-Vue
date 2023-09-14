@@ -306,28 +306,19 @@ export default {
     async handleControlChange(nodeNumber, relayNumber, control) {
       const node = this.nodes.find((node) => node.nodeNumber === nodeNumber)
       const relay = node.relays.find((relay) => relay.relayNumber === relayNumber)
-
       // 在发起请求之前先暂存控制状态
       const previousControl = relay.control
-
       // 禁用开关按钮
       relay.disabled = true
-
       try {
         // 调用服务器接口，改变控制状态
         const res = await controlRelay({ nodeNumber, relayNumber, control })
 
         if (res.code === 200 && res.success) {
-          const updatedRelay = res.body
-          // 更新对应的控制状态，并显示一个成功消息
-          relay.control = updatedRelay.control
-          const message = control ? '继电器开启成功' : '继电器关闭成功'
-          this.$message({
-            message: message,
-            type: 'success'
-          })
+          relay.control = res.body.control
+          this.showMessage(control ? '继电器开启成功' : '继电器关闭成功', 'success')
         } else {
-          // 如果控制状态改变失败或状态码不是200，则抛出一个错误，并恢复之前的状态
+          // 如果控制状态改变失败或状态码不是200，则抛出一个错误
           throw new Error('控制继电器失败')
         }
       } catch (error) {

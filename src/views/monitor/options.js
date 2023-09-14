@@ -6,46 +6,52 @@ export const options = [
   // },
   {
     label: '节点编号',
-    prop: 'select'
-  },
-  // {
-  //   label: '节点编号',
-  //   prop: 'number'
-  // },
-  {
-    label: '空气湿度(%RH)',
-    prop: 'airWet'
+    prop: 'number',
+    unit: ''
   },
   {
-    label: '空气温度(℃)',
-    prop: 'airTemperature'
+    label: '空气湿度',
+    prop: 'airWet',
+    unit: '%RH'
   },
   {
-    label: '二氧化碳(ppm)',
-    prop: 'CO2'
+    label: '空气温度',
+    prop: 'airTemperature',
+    unit: '℃'
   },
   {
-    label: '光照强度(万Lux)',
-    prop: 'light'
+    label: '二氧化碳',
+    prop: 'CO2',
+    unit: 'ppm'
   },
   {
-    label: '土壤湿度(%RH)',
-    prop: 'soilWet'
+    label: '光照强度',
+    prop: 'light',
+    unit: '万Lux'
   },
   {
-    label: '土壤温度(℃)',
-    prop: 'soilTemperature'
+    label: '土壤湿度',
+    prop: 'soilWet',
+    unit: '%RH'
+  },
+  {
+    label: '土壤温度',
+    prop: 'soilTemperature',
+    unit: '℃'
   },
   {
     label: '日期',
-    prop: 'date'
+    prop: 'date',
+    unit: ''
   },
   {
     label: '节点状态',
-    prop: 'action'
+    prop: 'action',
+    unit: ''
   },
   {
     label: '节点删除',
-    prop: 'delete'
+    prop: 'delete',
+    unit: ''
   }
 ]

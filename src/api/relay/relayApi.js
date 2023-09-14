@@ -27,7 +27,9 @@ export async function deleteNode(nodeNumber) {
 // 控制继电器
 export async function controlRelay(data) {
   const { nodeNumber, relayNumber, control } = data
-  return service.put(`/node/nodes/${nodeNumber}/relays/${relayNumber}`, { control })
+  return service.put(`/node/nodes/${nodeNumber}/relays/${relayNumber}`, { control }, {
+    timeout: 10000
+  })
 }
 
 // 获取当前模式
