@@ -42,36 +42,20 @@
         </el-form>
       </div>
       <!--表格部分-->
-      <el-table
-        :data="tableData"
-        stripe
-        :border="true"
-        :height="getHeightWithOutHeader"
-        highlight-current-row
-        style="font-size: 1rem"
-      >
-        <el-table-column
-          v-for="(item, index) in options"
-          :key="index"
-          :prop="item.prop"
-          :label="item.label"
-        >
+      <el-table :data="tableData" stripe :border="true" :height="getHeightWithOutHeader" highlight-current-row
+        style="font-size: 1rem">
+        <el-table-column v-for="(item, index) in options" :key="index" :prop="item.prop" :label="item.label">
           <!-- 如果是操作那一行就渲染一个控制开关 -->
           <template v-if="item.prop === 'action'" v-slot="{ row }">
-            <el-switch
-              v-model="row.control"
-              active-color="#13ce66"
-              inactive-color="#ff4949"
-              :disabled="autoMode"
-              @change="handleControlChange(row.id, row.control)"
-            />
+            <el-switch v-model="row.control" active-color="#13ce66" inactive-color="#ff4949" :disabled="autoMode"
+              @change="handleControlChange(row.id, row.control)" />
           </template>
           <!-- 如果是删除那一行就渲染一个删除开关，注意这里需要加上else，因为有两个template如果不加上else下面会把上面的替换掉 -->
           <template v-else-if="item.prop === 'delete'" v-slot="{ row }">
             <el-button type="danger" plain @click="deleteMethod(row.number)">删除节点</el-button>
           </template>
           <!-- 是选择列就渲染一个单选框-->
-          <template v-else-if="item.prop === 'select'" v-slot="{ row }">
+          <template v-else-if="item.prop === 'number'" v-slot="{ row }">
             <el-checkbox v-model="selectPoints" :label="row.number" border />
           </template>
           <!-- 是其他列就显示数据和单位 -->
@@ -122,7 +106,7 @@ export default {
       this.autoMode = response.body.status
       await this.getData()
 
-      this.dataInterval = setInterval(async() => {
+      this.dataInterval = setInterval(async () => {
         await this.getData()
         const response = await getCurrentMode()
         this.autoMode = response.body.status
@@ -218,7 +202,7 @@ export default {
       if (this.t) {
         clearTimeout(this.t)
       }
-      this.t = setTimeout(async() => {
+      this.t = setTimeout(async () => {
         try {
           const res = await pointControlChange({ id, control })
           if (res.success) {
