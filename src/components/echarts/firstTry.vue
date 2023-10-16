@@ -10,9 +10,15 @@
           </el-col>
           <el-col>
             <el-form-item>
-              <el-button type="primary" size="large" @click="fetchData">查询</el-button>
+              <el-button type="primary" size="large" @click="fetchData"
+                >查询</el-button
+              >
               <span id="Tips">按键跳转</span>
-              <el-button v-for="(dataType, index) in chartDataTypesTitles" :key="dataType" @click="goToChart(index)">
+              <el-button
+                v-for="(dataType, index) in chartDataTypesTitles"
+                :key="dataType"
+                @click="goToChart(index)"
+              >
                 {{ dataType }}
               </el-button>
             </el-form-item>
@@ -22,8 +28,13 @@
     </el-card>
 
     <!--   为每一个元素串讲一个图表-->
-    <div v-for="dataType in chartDataTypes" :id="dataType" :key="dataType" :ref="dataType" style="width: 100%; height: 500px; margin-top: 20px;" />
-
+    <div
+      v-for="dataType in chartDataTypes"
+      :id="dataType"
+      :key="dataType"
+      :ref="dataType"
+      style="width: 100%; height: 500px; margin-top: 20px"
+    />
   </div>
 </template>
 
@@ -40,17 +51,31 @@ export default {
       timer: null,
       initNodes: [], // 默认的节点
       requestSource: axios.CancelToken.source(),
-      chartDataTypes: ['AirWet', 'AirTemperature', 'CO2', 'Light', 'SoilWet', 'SoilTemperature'],
-      chartDataTypesTitles: ['空气湿度', '空气温度', '二氧化碳', '光照', '土壤湿度', '土壤温度']
+      chartDataTypes: [
+        'AirWet',
+        'AirTemperature',
+        'CO2',
+        'Light',
+        'SoilWet',
+        'SoilTemperature'
+      ],
+      chartDataTypesTitles: [
+        '空气湿度',
+        '空气温度',
+        '二氧化碳',
+        '光照',
+        '土壤湿度',
+        '土壤温度'
+      ]
     }
   },
-  mounted: function() {
-    this.chartDataTypes.forEach(dataType => {
+  mounted: function () {
+    this.chartDataTypes.forEach((dataType) => {
       this.charts[dataType] = echarts.init(this.$refs[dataType][0])
     })
     // 默认选取节点前三个显示
     getNodes()
-      .then(result => {
+      .then((result) => {
         console.log(result)
         for (let i = 0; i <= 2; i++) {
           const nodeNumberValue = result.body.content[i].nodeNumber
@@ -59,7 +84,7 @@ export default {
         this.updateChart(this.initNodes)
         this.$message.success('初始化图表成功')
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error while fetching nodes:', error)
       })
 
@@ -82,17 +107,23 @@ export default {
     },
     // 向后端获取数据方法
     async fetchData() {
-      const filteredNodes = this.nodes.filter(node => node.trim() !== '')// 如果输入框没有输入要查询的节点，向后端查询默认节点
+      const filteredNodes = this.nodes.filter((node) => node.trim() !== '') // 如果输入框没有输入要查询的节点，向后端查询默认节点
       try {
-        const nodesToSend = filteredNodes.length ? filteredNodes : this.initNodes
+        const nodesToSend = filteredNodes.length
+          ? filteredNodes
+          : this.initNodes
         console.log('请求数据:' + nodesToSend)
-        const response = await axios.post('http://47.114.81.63:8081/node/chartData', {
-          nodes: nodesToSend
-        }, {
-          cancelToken: this.requestSource.token
-        })
+        const response = await axios.post(
+          'https://www.dpmonitor.top:8082/node/chartData',
+          {
+            nodes: nodesToSend
+          },
+          {
+            cancelToken: this.requestSource.token
+          }
+        )
         if (response.data.success) {
-          this.updateChart(response.data.body)// 这里调用updateChart修改图表数据
+          this.updateChart(response.data.body) // 这里调用updateChart修改图表数据
         } else {
           this.$message.error('获取数据失败')
         }
@@ -108,12 +139,12 @@ export default {
     // 把后端数据修改适合图表展示
     formatChartData(rawData) {
       const result = {}
-      this.chartDataTypes.forEach(dataType => {
+      this.chartDataTypes.forEach((dataType) => {
         result[dataType] = {}
         for (const node in rawData[0]) {
-          rawData[0][node].forEach(dataObj => {
+          rawData[0][node].forEach((dataObj) => {
             if (dataObj[dataType]) {
-              result[dataType][node] = dataObj[dataType].map(dataEntry => {
+              result[dataType][node] = dataObj[dataType].map((dataEntry) => {
                 const parts = dataEntry.split(' : ')
                 return {
                   timestamp: parts[0],
@@ -128,15 +159,21 @@ export default {
     },
     // 修改图表数据的方法
     updateChart(data) {
-      const formattedData = this.formatChartData(data)// 调用格式化方法把后端数据格式化
+      const formattedData = this.formatChartData(data) // 调用格式化方法把后端数据格式化
       // console.log(formattedData)//可以去控制台查看格式后的数据
 
       this.chartDataTypes.forEach((dataType, index) => {
         const seriesData = []
         for (const node in formattedData[dataType]) {
-          formattedData[dataType][node].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))// 排序方便数据按顺序展示
-          const times = formattedData[dataType][node].map(entry => entry.timestamp)// 返回每个节点的timestamp属性（数组）
-          const values = formattedData[dataType][node].map(entry => entry.value)
+          formattedData[dataType][node].sort(
+            (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+          ) // 排序方便数据按顺序展示
+          const times = formattedData[dataType][node].map(
+            (entry) => entry.timestamp
+          ) // 返回每个节点的timestamp属性（数组）
+          const values = formattedData[dataType][node].map(
+            (entry) => entry.value
+          )
           // formattedData[dataType][node] = [
           //   { timestamp: '2023-08-01', value: 10 },
           //   { timestamp: '2023-08-02', value: 12 },
@@ -162,12 +199,12 @@ export default {
         const option = {
           tooltip: {
             trigger: 'axis',
-            position: function(pt) {
+            position: function (pt) {
               return [pt[0], '10%']
             }
           },
           title: {
-            text: this.chartDataTypesTitles[index]// 这里把图表标题改为中文
+            text: this.chartDataTypesTitles[index] // 这里把图表标题改为中文
           },
           legend: {},
           toolbox: {
@@ -212,7 +249,7 @@ export default {
   margin-right: 5px;
 }
 
-#Tips{
+#Tips {
   margin: 0 10px 0 30px;
   font-size: 18px;
 }

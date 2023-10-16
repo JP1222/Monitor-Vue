@@ -39,7 +39,7 @@ export async function setCurrentMode(mode) {
 export async function getExcel(startDate, endDate, selectPoints) {
   try {
     const response = await Axios({
-      url: 'http://47.114.81.63:8081/history/excel',
+      url: 'https://www.dpmonitor.top:8082/history/excel',
       method: 'get',
       responseType: 'blob',
       params: {
