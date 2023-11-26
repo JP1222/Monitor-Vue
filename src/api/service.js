@@ -4,9 +4,7 @@ import store from '@/store'
 import { getToken } from '@/utils/auth'
 
 const service = axios.create({
-  // baseURL: 'http://47.114.81.63:8081',
-  baseURL: 'https://www.dpmonitor.top:8082',
-  // baseURL: 'http://localhost:8081',
+  baseURL: process.env.VUE_APP_BASE_API,
   timeout: 5000
 })
 

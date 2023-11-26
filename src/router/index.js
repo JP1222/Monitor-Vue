@@ -79,27 +79,6 @@ export const constantRoutes = [
     ]
   },
 
-  // {
-  //   path: '/dataMonitor',
-  //   component: Layout,
-  //   redirect: '/example/table',
-  //   name: 'DataMonitor',
-  //   meta: { title: '数据监测', icon: 'el-icon-monitor' },
-  //   children: [
-  //     {
-  //       path: 'monitor',
-  //       name: 'Monitor',
-  //       component: () => import('@/views/monitor/index'),
-  //       meta: { title: '实时监测', icon: 'el-icon-s-marketing' }
-  //     },
-  //     {
-  //       path: 'relayModule',
-  //       name: 'RelayModule',
-  //       component: () => import('@/views/relay/index'),
-  //       meta: { title: '灌溉控制', icon: 'el-icon-switch-button' }
-  //     }
-  //   ]
-  // },
   { path: '*', redirect: '/404', hidden: true }
 ]
 

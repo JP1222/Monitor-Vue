@@ -38,8 +38,9 @@ export async function setCurrentMode(mode) {
 // 导出表格
 export async function getExcel(startDate, endDate, selectPoints) {
   try {
+    //因为后段这里直接返回了二进制数据，server.js 配置 无法直接返回数据，所以这里直接用axios了
     const response = await Axios({
-      url: 'https://www.dpmonitor.top:8082/history/excel',
+      url: process.env.VUE_APP_BASE_API + '/history/excel',
       method: 'get',
       responseType: 'blob',
       params: {
